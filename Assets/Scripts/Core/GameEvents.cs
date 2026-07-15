@@ -6,8 +6,11 @@ public class GameEvents
 {
     public enum EventType
     {
-        PickUp,
-        Drop
+        OnGameStart,
+        OnTimerFinished,
+        OnAllTasksFinished,
+        OnPickUp,
+        OnDrop
     }
     
     private Dictionary<EventType, List<Delegate>> events =

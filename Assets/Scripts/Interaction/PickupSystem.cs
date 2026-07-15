@@ -9,10 +9,12 @@ public class PickupSystem : MonoBehaviour
     private Transform heldItem;
 
     public bool IsHoldingItem => heldItem != null;
+    public IPickable HeldItem =>
+        heldItem?.GetComponent<IPickable>();
 
     private void Start()
     {
-        GameManager.gameEvents.AddEvent<Transform>(GameEvents.EventType.PickUp, PickUpItem);
+        GameManager.gameEvents.AddEvent<Transform>(GameEvents.EventType.OnPickUp, PickUpItem);
     }
 
     public void PickUpItem(Transform item)
@@ -37,8 +39,20 @@ public class PickupSystem : MonoBehaviour
         
         DropItem(heldItem);
         heldItem = null;
-        GameManager.gameEvents.TriggerEvent(GameEvents.EventType.Drop);
+        GameManager.gameEvents.TriggerEvent(GameEvents.EventType.OnDrop);
 
+    }
+    
+    public IPickable ReleaseHeldItem()
+    {
+        if (heldItem == null)
+            return null;
+
+        IPickable item = heldItem.GetComponent<IPickable>();
+
+        heldItem = null;
+
+        return item;
     }
 
     public void ThrowHeldItem()
@@ -59,7 +73,7 @@ public class PickupSystem : MonoBehaviour
         rb.useGravity = true;
 
         rb.AddForce(transform.forward * throwForce, ForceMode.Impulse);
-        GameManager.gameEvents.TriggerEvent(GameEvents.EventType.Drop);
+        GameManager.gameEvents.TriggerEvent(GameEvents.EventType.OnDrop);
     }
 
     private void DropItem(Transform item)

@@ -72,20 +72,29 @@ public class PlayerController : MonoBehaviour
 
         float heldTime = Time.time - interactPressedTime;
         playerUIManager.ResetInteractCharge();
-
-        // Holding item = drop
-        if (pickupSystem.IsHoldingItem)
-        {
-            pickupSystem.DropHeldItem();
-            return;
-        }
-
+        
         IInteractable interactable =
             interactionSystem.CurrentInteractable;
 
         if (interactable == null)
             return;
 
+        // Holding item = drop
+        if (pickupSystem.IsHoldingItem)
+        {
+            if (interactable is IItemReceiver receiver &&
+                receiver.CanReceive(pickupSystem.HeldItem))
+            {
+                IPickable item = pickupSystem.ReleaseHeldItem();
+
+                receiver.Receive(item);
+                return;
+            }
+
+            pickupSystem.DropHeldItem();
+            return;
+        }
+        
         // Instant interaction
         if (interactable.HoldDuration <= 0f)
         {

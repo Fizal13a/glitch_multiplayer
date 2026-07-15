@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,18 +5,14 @@ public class InteractionSystem : MonoBehaviour
 {
     private readonly List<IInteractable> interactables = new();
 
+    private PickupSystem pickupSystem;
     private IInteractable currentInteractable;
-    
+
     public IInteractable CurrentInteractable => currentInteractable;
 
-    private bool canFindObjects = false;
-
-    private void Start()
+    private void Awake()
     {
-        canFindObjects = true;
-        
-        GameManager.gameEvents.AddEvent<Transform>(GameEvents.EventType.PickUp, OnPickUpItem);
-        GameManager.gameEvents.AddEvent(GameEvents.EventType.Drop, OnDropItem);
+        pickupSystem = GetComponent<PickupSystem>();
     }
 
     private void Update()
@@ -27,8 +22,6 @@ public class InteractionSystem : MonoBehaviour
 
     private void FindClosestInteractable()
     {
-        if(!canFindObjects) return;
-        
         IInteractable closest = null;
         float closestDistance = Mathf.Infinity;
 
@@ -37,9 +30,16 @@ public class InteractionSystem : MonoBehaviour
             if (interactable == null)
                 continue;
 
+            if (pickupSystem.IsHoldingItem &&
+                interactable is not IItemReceiver)
+            {
+                continue;
+            }
+
             float distance = Vector3.Distance(
                 transform.position,
-                ((MonoBehaviour)interactable).transform.position);
+                ((MonoBehaviour)interactable).transform.position
+            );
 
             if (distance < closestDistance)
             {
@@ -51,15 +51,17 @@ public class InteractionSystem : MonoBehaviour
         if (closest == currentInteractable)
             return;
 
-        // Remove highlight from previous
         if (currentInteractable != null)
+        {
             currentInteractable.Highlight(false);
+        }
 
         currentInteractable = closest;
 
-        // Highlight new
         if (currentInteractable != null)
+        {
             currentInteractable.Highlight(true);
+        }
     }
 
     public void Interact()
@@ -67,24 +69,14 @@ public class InteractionSystem : MonoBehaviour
         currentInteractable?.Interact();
     }
 
-    private void OnPickUpItem(Transform interactable)
-    {
-        canFindObjects = false;
-        RemoveAllInteractables();
-    }
-    
-    private void OnDropItem()
-    {
-        canFindObjects = true;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        if(!canFindObjects) return;
-
         if (other.TryGetComponent(out IInteractable interactable))
         {
-            interactables.Add(interactable);
+            if (!interactables.Contains(interactable))
+            {
+                interactables.Add(interactable);
+            }
         }
     }
 
@@ -100,15 +92,5 @@ public class InteractionSystem : MonoBehaviour
                 currentInteractable = null;
             }
         }
-    }
-    
-    private void RemoveAllInteractables()
-    {
-        foreach (var interactable in interactables)
-        {
-            interactable?.Highlight(false);
-        }
-
-        interactables.Clear();
     }
 }

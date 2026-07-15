@@ -4,7 +4,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
    public static GameManager instance;
-   public static GameEvents gameEvents;
+   
+   public static readonly GameEvents gameEvents = new GameEvents();
 
    private void Awake()
    {
@@ -12,10 +13,10 @@ public class GameManager : MonoBehaviour
       {
          instance = this;
       }
+   }
 
-      if (gameEvents == null)
-      {
-         gameEvents = new GameEvents();
-      }
+   private void Start()
+   {
+      gameEvents.TriggerEvent(GameEvents.EventType.OnGameStart);
    }
 }

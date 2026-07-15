@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Box : MonoBehaviour, IInteractable, IPickable
+public class Fuse : MonoBehaviour, IInteractable, IPickable
 {
     [Header("Components")]
     private MeshRenderer meshRenderer;
@@ -20,7 +20,7 @@ public class Box : MonoBehaviour, IInteractable, IPickable
 
     public void Interact()
     {
-        Debug.Log("Item Interacted");
+        Debug.Log("Fuse Interacted");
         PickUp();
     }
 
