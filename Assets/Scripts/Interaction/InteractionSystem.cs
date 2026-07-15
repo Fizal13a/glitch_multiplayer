@@ -29,6 +29,9 @@ public class InteractionSystem : MonoBehaviour
         {
             if (interactable == null)
                 continue;
+            
+            if (!interactable.CanInteract)
+                continue;
 
             if (pickupSystem.IsHoldingItem &&
                 interactable is not IItemReceiver)

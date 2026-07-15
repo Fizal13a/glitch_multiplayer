@@ -11,6 +11,8 @@ public class FuseSocket : TaskObjective, IInteractable, IItemReceiver
 
     private Material defaultMaterial;
 
+    public bool CanInteract => !IsCompleted;
+    
     public float HoldDuration => 0f;
 
     private void Awake()
@@ -38,6 +40,7 @@ public class FuseSocket : TaskObjective, IInteractable, IItemReceiver
         Transform fuseTransform = fuse.transform;
 
         fuseTransform.SetParent(fuseInsertPoint);
+        fuse.DisableInteraction();
 
         fuseTransform.localPosition = Vector3.zero;
         fuseTransform.localRotation = Quaternion.identity;

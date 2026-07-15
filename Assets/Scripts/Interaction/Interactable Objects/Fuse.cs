@@ -1,15 +1,13 @@
 using System;
 using UnityEngine;
 
-public class Fuse : MonoBehaviour, IInteractable, IPickable
+public class Fuse : PickableItem
 {
     [Header("Components")]
     private MeshRenderer meshRenderer;
     private Material defaultMaterial;
+
     [SerializeField] private Material highlightMaterial;
-    
-    public bool isPicked { get; set; }
-    public float HoldDuration { get; }
 
     private void Awake()
     {
@@ -17,25 +15,10 @@ public class Fuse : MonoBehaviour, IInteractable, IPickable
         defaultMaterial = meshRenderer.material;
     }
 
-
-    public void Interact()
+    public override void Highlight(bool enable)
     {
-        Debug.Log("Fuse Interacted");
-        PickUp();
-    }
-
-    public void Highlight(bool enable)
-    {
-        meshRenderer.material = enable ? highlightMaterial : defaultMaterial;
-    }
-
-    public void PickUp()
-    {
-        GameManager.gameEvents.TriggerEvent<Transform>(GameEvents.EventType.OnPickUp, this.transform);
-    }
-
-    public void Drop()
-    {
-        GameManager.gameEvents.TriggerEvent<Transform>(GameEvents.EventType.OnDrop, this.transform);
+        meshRenderer.material = enable
+            ? highlightMaterial
+            : defaultMaterial;
     }
 }

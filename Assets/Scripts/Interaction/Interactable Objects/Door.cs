@@ -6,7 +6,8 @@ public class Door : MonoBehaviour, IInteractable
     private MeshRenderer meshRenderer;
     private Material defaultMaterial;
     [SerializeField] private Material highlightMaterial;
-    
+
+    public bool CanInteract { get; }
     public float HoldDuration { get; }
     
     private void Awake()

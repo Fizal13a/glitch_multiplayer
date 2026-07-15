@@ -9,6 +9,7 @@ public class Box : MonoBehaviour, IInteractable, IPickable
     [SerializeField] private Material highlightMaterial;
     
     public bool isPicked { get; set; }
+    public bool CanInteract { get; }
     public float HoldDuration { get; }
 
     private void Awake()
