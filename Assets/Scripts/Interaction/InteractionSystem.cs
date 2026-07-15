@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,18 @@ public class InteractionSystem : MonoBehaviour
     private readonly List<IInteractable> interactables = new();
 
     private IInteractable currentInteractable;
+    
+    public IInteractable CurrentInteractable => currentInteractable;
+
+    private bool canFindObjects = false;
+
+    private void Start()
+    {
+        canFindObjects = true;
+        
+        GameManager.gameEvents.AddEvent<Transform>(GameEvents.EventType.PickUp, OnPickUpItem);
+        GameManager.gameEvents.AddEvent(GameEvents.EventType.Drop, OnDropItem);
+    }
 
     private void Update()
     {
@@ -14,6 +27,8 @@ public class InteractionSystem : MonoBehaviour
 
     private void FindClosestInteractable()
     {
+        if(!canFindObjects) return;
+        
         IInteractable closest = null;
         float closestDistance = Mathf.Infinity;
 
@@ -52,8 +67,21 @@ public class InteractionSystem : MonoBehaviour
         currentInteractable?.Interact();
     }
 
+    private void OnPickUpItem(Transform interactable)
+    {
+        canFindObjects = false;
+        RemoveAllInteractables();
+    }
+    
+    private void OnDropItem()
+    {
+        canFindObjects = true;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        if(!canFindObjects) return;
+
         if (other.TryGetComponent(out IInteractable interactable))
         {
             interactables.Add(interactable);
@@ -72,5 +100,15 @@ public class InteractionSystem : MonoBehaviour
                 currentInteractable = null;
             }
         }
+    }
+    
+    private void RemoveAllInteractables()
+    {
+        foreach (var interactable in interactables)
+        {
+            interactable?.Highlight(false);
+        }
+
+        interactables.Clear();
     }
 }
